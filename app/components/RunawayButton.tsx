@@ -4,8 +4,10 @@ import { useRef, useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 
 const MARGIN = 32;
-const MOVE_DISTANCE = 90;
-const TRIGGER_DISTANCE = 100;
+/** Cursor within this distance triggers the button to move */
+const TRIGGER_DISTANCE = 70;
+/** Button tries to sit this far from the cursor (just out of reach) */
+const TARGET_DISTANCE = 75;
 
 type RunawayButtonProps = {
   onClick?: () => void;
@@ -20,6 +22,9 @@ export default function RunawayButton({
 }: RunawayButtonProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const restCenterRef = useRef<{ x: number; y: number } | null>(null);
+  const positionRef = useRef(position);
+  positionRef.current = position;
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     const btn = buttonRef.current;
@@ -28,31 +33,39 @@ export default function RunawayButton({
     const rect = btn.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
+
+    if (restCenterRef.current === null) {
+      restCenterRef.current = {
+        x: centerX - positionRef.current.x,
+        y: centerY - positionRef.current.y,
+      };
+    }
+    const rest = restCenterRef.current;
+
     const dx = e.clientX - centerX;
     const dy = e.clientY - centerY;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     if (distance < TRIGGER_DISTANCE) {
-      const angle = Math.atan2(dy, dx);
-      const moveX = -Math.cos(angle) * MOVE_DISTANCE;
-      const moveY = -Math.sin(angle) * MOVE_DISTANCE;
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const minCenterX = MARGIN + rect.width / 2;
+      const maxCenterX = viewportWidth - MARGIN - rect.width / 2;
+      const minCenterY = MARGIN + rect.height / 2;
+      const maxCenterY = viewportHeight - MARGIN - rect.height / 2;
 
-      setPosition((prev) => {
-        let newX = prev.x + moveX;
-        let newY = prev.y + moveY;
+      const dirX = -dx / distance;
+      const dirY = -dy / distance;
+      let targetCenterX = e.clientX + dirX * TARGET_DISTANCE;
+      let targetCenterY = e.clientY + dirY * TARGET_DISTANCE;
 
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        const maxX = viewportWidth / 2 - rect.width - MARGIN;
-        const maxY = viewportHeight / 2 - rect.height - MARGIN;
-        const minX = -viewportWidth / 2 + rect.width + MARGIN;
-        const minY = -viewportHeight / 2 + rect.height + MARGIN;
+      targetCenterX = Math.max(minCenterX, Math.min(maxCenterX, targetCenterX));
+      targetCenterY = Math.max(minCenterY, Math.min(maxCenterY, targetCenterY));
 
-        newX = Math.max(minX, Math.min(maxX, newX));
-        newY = Math.max(minY, Math.min(maxY, newY));
+      const newX = targetCenterX - rest.x;
+      const newY = targetCenterY - rest.y;
 
-        return { x: newX, y: newY };
-      });
+      setPosition({ x: newX, y: newY });
     } else {
       setPosition({ x: 0, y: 0 });
     }
@@ -84,8 +97,8 @@ export default function RunawayButton({
         }}
         transition={{
           type: "spring",
-          stiffness: 350,
-          damping: 25,
+          stiffness: 120,
+          damping: 28,
         }}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
