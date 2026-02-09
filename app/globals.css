@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --valentine-pink: #ffb6c1;
+  --valentine-red: #e63946;
+  --valentine-cream: #fff5f7;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Smooth scroll and prevent layout shift */
+html {
+  scroll-behavior: smooth;
+}
