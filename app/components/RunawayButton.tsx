@@ -5,9 +5,9 @@ import { motion } from "framer-motion";
 
 const MARGIN = 32;
 /** Cursor within this distance triggers the button to move */
-const TRIGGER_DISTANCE = 70;
-/** Button tries to sit this far from the cursor (just out of reach) */
-const TARGET_DISTANCE = 75;
+const TRIGGER_DISTANCE = 100;
+/** Button center stays this far from cursor so cursor is never over the button */
+const TARGET_DISTANCE = 130;
 
 type RunawayButtonProps = {
   onClick?: () => void;
@@ -97,8 +97,8 @@ export default function RunawayButton({
         }}
         transition={{
           type: "spring",
-          stiffness: 120,
-          damping: 28,
+          stiffness: 480,
+          damping: 32,
         }}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}

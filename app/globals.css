@@ -13,7 +13,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Smooth scroll and prevent layout shift */
 html {
   scroll-behavior: smooth;
 }

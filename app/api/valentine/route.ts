@@ -9,7 +9,7 @@ const TO_EMAIL = process.env.VALENTINE_NOTIFICATION_EMAIL || "";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, accepted } = body;
+    const { name, accepted, note } = body;
 
     if (!name || typeof name !== "string") {
       return NextResponse.json(
@@ -37,11 +37,16 @@ export async function POST(request: NextRequest) {
       ? `💕 Yes! ${name} said yes to being your Valentine!`
       : `Valentine's Day response from ${name}`;
 
+    const noteHtml = note && typeof note === "string" && note.trim()
+      ? `<p style="margin-top: 16px; padding: 12px; background: #fff5f7; border-radius: 8px; border-left: 4px solid #e63946;"><em>Their note:</em> "${note.trim().replace(/"/g, "&quot;")}"</p>`
+      : "";
+
     const html = `
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
         <h2 style="color: #e63946;">Valentine's Day 💕</h2>
         <p><strong>${name}</strong> ${accepted ? "said <em>Yes!</em> to being your Valentine! 🎉" : "responded."}</p>
-        <p style="color: #888; font-size: 14px;">Sent from your Valentine's Day site.</p>
+        ${noteHtml}
+        <p style="color: #888; font-size: 14px; margin-top: 24px;">Sent from your Valentine's Day site.</p>
       </div>
     `;
 

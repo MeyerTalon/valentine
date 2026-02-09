@@ -12,6 +12,7 @@ export default function ValentinePage() {
   const [name, setName] = useState("");
   const [screen, setScreen] = useState<Screen>("name");
   const [inputValue, setInputValue] = useState("");
+  const [note, setNote] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
 
@@ -32,7 +33,7 @@ export default function ValentinePage() {
       const res = await fetch("/api/valentine", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, accepted: true }),
+        body: JSON.stringify({ name, accepted: true, note: note.trim() || undefined }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -99,6 +100,13 @@ export default function ValentinePage() {
               <h2 className="font-poppins font-semibold text-2xl md:text-4xl text-valentine-red leading-tight">
                 Will you be my Valentine, {name}?
               </h2>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Write a note"
+                rows={2}
+                className="w-full max-w-sm mx-auto px-3 py-2 rounded-xl border-2 border-valentine-pink bg-white/80 text-valentine-red placeholder-valentine-pink-dark/60 focus:outline-none focus:ring-2 focus:ring-valentine-red/40 focus:border-valentine-red font-quicksand text-sm resize-none block"
+              />
               <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
@@ -147,6 +155,11 @@ export default function ValentinePage() {
               <p className="font-quicksand text-lg text-valentine-red-soft">
                 You just made my day. Happy Valentine&apos;s Day!
               </p>
+              {note.trim() && (
+                <blockquote className="font-quicksand text-valentine-red-soft/90 italic border-l-4 border-valentine-pink pl-4 py-2 text-left max-w-md mx-auto">
+                  &ldquo;{note.trim()}&rdquo;
+                </blockquote>
+              )}
               {isSending && (
                 <p className="font-quicksand text-valentine-pink-dark">Sending a little note...</p>
               )}
