@@ -16,7 +16,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Will you be my Valentine? 💕",
+  title: "Suprise for Liszieannie ;) 💕",
   description: "A sweet Valentine's Day surprise",
 };
 
